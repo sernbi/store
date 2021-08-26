@@ -1,0 +1,16 @@
+a = int(input())
+b = int(input())
+c = int(input())
+d = int(input())
+e = int(input())
+f = int(input())
+g = int(input())
+h = int(input())
+i = int(input())
+j = int(input())
+sum = a+b+c+d+e+f+g+h+i+j
+tp = max(a,b,c,d,e,f,g,h,i,j)
+ave = (a+b+c+d+e+f+g+h+i+j)/10
+print(sum)
+print(tp)
+print(ave)
