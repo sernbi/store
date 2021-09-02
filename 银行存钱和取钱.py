@@ -2,16 +2,16 @@ import random
 print("==============================================")
 print("|------------中国工商银行账户管理系统------------|")
 print("|------------1、开户              ------------|")
-print("|------------2、取钱              ------------|")
-print("|------------3、存钱              ------------|")
+print("|------------2、存钱              ------------|")
+print("|------------3、取钱              ------------|")
 print("|------------4、转账              ------------|")
 print("|------------5、查询              ------------|")
 print("|------------6、退出              ------------|")
 print("==============================================")
-bank={'frank': {'account': 88474479, 'password': '1234', 'country': '1', 'province': '1', 'street': '1', 'door': '1', 'money': 1000, 'bank_name': '狼腾测试猿银行'},
-      'abc': {'account':12345678, 'password': '1234', 'country': '1', 'province': '1', 'street': '1', 'door': '1', 'money': 1000, 'bank_name': '狼腾测试猿银行'},
-      '456': {'account':88888888, 'password': '1234', 'country': '1', 'province': '1', 'street': '1', 'door': '1', 'money': 1000, 'bank_name': '狼腾测试猿银行'},
-      'liuxing': {'account': 66666666, 'password': '1234', 'country': '1', 'province': '1', 'street': '1', 'door': '1', 'money': 1000, 'bank_name': '狼腾测试猿银行'}}#创建一个空的字典
+bank={12345678: {'username': 'frank', 'password': '1234', 'country': '1', 'province': '1', 'street': '1', 'door': '1', 'money': 1000, 'bank_name': '狼腾测试猿银行'},
+      66666666: {'username':'123', 'password': '1234', 'country': '1', 'province': '1', 'street': '1', 'door': '1', 'money': 1000, 'bank_name': '狼腾测试猿银行'},
+      88888888: {'username':'456', 'password': '1234', 'country': '1', 'province': '1', 'street': '1', 'door': '1', 'money': 1000, 'bank_name': '狼腾测试猿银行'},
+      99999999: {'username':'789', 'password': '1234', 'country': '1', 'province': '1', 'street': '1', 'door': '1', 'money': 1000, 'bank_name': '狼腾测试猿银行'}}#创建一个空的字典
 #开户逻辑
 bank_name="狼腾测试猿银行"
 
@@ -23,8 +23,8 @@ def bank_adduser(account,username,password,country,province,street,door):
         return 3
     if username in bank:#  如变量在容器内执行下面的代码
         return 2
-    bank[username]={
-        "account":account,#
+    bank[account]={
+        "username":username,#
         "password":password,
         "country":country,
         "province":province,
@@ -63,69 +63,115 @@ def adduser():#定义了一个方法
                     开户行名称：%s
                 '''
         # 每个元素都可传入%
-        print(info % (username, account, country, province, street, door, bank[username]["money"], bank_name))
+        print(info % (username, account, country, province, street, door, bank[account]["money"], bank_name))
+
+#{'frank': {'y': 88474479, 'password': '1234', 'country': '1', 'province': '1', 'street': '1', 'door': '1', 'money': 0, 'bank_name': '狼腾测试猿银行'}}
+
 
 #存钱
 def addmoney():
     account = int(input("请输入您的账号"))
-    username= list(bank.keys())
-    for i in range(len(username)):
-        if account == bank[username[i]]['account']:
-            money = bank[username[i]]['money']
-            print("欢迎")
-            print("您的余额：", money)
-            money1 = int(input("请输入想要储蓄的金额："))
-            money = money + money1
-            bank[username[i]]['money'] = money
-            info = '''
-                        ------------个人信息------------
-                        用户名:%s
-                        账号：%s
-                        余额：%s
-                        开户行名称：%s
-                    '''
-            # 每个元素都可传入%
-            print(info % (username[i], account, money, bank_name))
-        else:
-            return 0
-    return 1
-#{'frank': {'y': 88474479, 'password': '1234', 'country': '1', 'province': '1', 'street': '1', 'door': '1', 'money': 0, 'bank_name': '狼腾测试猿银行'}}
+    # account ="account" in bank
+    if account in bank.keys():
+        money1 = int(input("请输入您需要存入的金额："))
+        money = bank[account]['money']
+        money = money + money1
+        info = '''
+                    ------------个人信息------------
+                    用户名:%s
+                    账号：%s
+                    余额：%s
+                    开户行名称：%s
+                '''
+        # 每个元素都可传入%
+        print(info % (bank[account]['username'], account, money, bank_name))
 
+        print("您现在的余额为：",money)
+    else:
+        print("您的账户输入错误")
 #取钱
 def remoney():
     account= int(input("请输入您的账号："))
     password = input("请输入您的密码：")
-    username= list(bank.keys())
-    for i in range(len(username)):
-        if account == bank[username[i]]['account']:
-            if password == bank[username[i]]['password']:
-                money = bank[username[i]]['money']
-                print("欢迎")
-                print("您的余额：", money)
-                money1 = int(input("请输入想要取出的金额："))
-                if money1 <= money:
-                    money = money - money1
-                    bank[username[i]]['money'] = money
-                    info = '''
-                                ------------个人信息------------
-                                用户名:%s
-                                账号：%s
-                                余额：%s
-                                开户行名称：%s
-                            '''
-                    # 每个元素都可传入%
-                    print(info % (username[i], account,money, bank_name))
-                else:
-                    print(("余额不足"))
+    # username= list(bank.keys())
+    # for i in range(len(username)):
+    if account in bank.keys():
+        if password == bank[account]['password']:
+            money = bank[account]['money']
+            print("欢迎")
+            print("您的余额：", money)
+            money1 = int(input("请输入想要取出的金额："))
+            if money1 <= money:
+                money = money - money1
+                bank[account]['money'] = money
+                info = '''
+                            ------------个人信息------------
+                            用户名:%s
+                            账号：%s
+                            余额：%s
+                            开户行名称：%s
+                        '''
+                # 每个元素都可传入%
+                print(info % (bank[account]['username'], account,money, bank_name))
             else:
-                print("密码错误")
-        else :
-            print("账号不存在")
+                print(("余额不足"))
+        else:
+            print("密码错误")
+    else :
+        print("账号不存在")
     return 1
 
-# begin=input("请选择业务")
+
+#转账
+def zhuanzhang():
+    account1 = int(input("请输入转出的账号："))
+    account2 = int(input("请输入转入的账号："))
+    if account1 in bank.keys() and account2 in  bank.keys():
+        password1 = str(input("请输入转出账号的密码："))
+        password2 = str(input("请输入转入账号的密码："))
+        if password1 in  bank[account1]["password"] and password2 in bank[account2]["password"]:
+            mvmoney = int(input("请输入您要转出的金额："))
+            if mvmoney < bank[account1]["money"]:
+                money = bank[account1]["money"] - mvmoney
+                bank[account1]["money"] = money
+                getmoney = bank[account2]["money"] + mvmoney
+                bank[account2]["money"] = getmoney
+                print("转出",mvmoney,"元后，您的账号",account1,"余额为：",money)
+                print("转入账号",account2,"的余额为：",getmoney)
+            else:
+                print("您的余额不足")
+        else:
+            print("密码错误")
+    else:
+        print("用户不存在")
+
+#查询
+def chaxun():
+    account = int(input("请输入您的账号："))
+    if account in bank.keys():
+        password = input("请输入密码：")
+        if password == bank[account]['password']:
+            info = '''
+                               ------------个人信息------------
+                               用户名:%s
+                               账号：%s
+                               密码：*****
+                               国籍：%s
+                               省份：%s
+                               街道：%s
+                               门牌号：%s
+                               余额：%s
+                               开户行名称：%s
+                           '''
+            # 每个元素都可传入%
+            print(info % (bank[account]['username'], account, bank[account]['country'], bank[account]['province'], bank[account]['street'], bank[account]['door'], bank[account]["money"], bank[account]['bank_name']))
+    else:
+        print("用户不存在")
+
+
+#begin=input("请选择业务")
 while True:
-    begin = input("请选择业务")
+    begin = input("请选择业务：")
     if begin =="1":#您输入的业务等于1执行开户操作
         adduser()
     elif begin == "2":
@@ -136,19 +182,14 @@ while True:
         remoney()
     elif begin == "4":
         print(4,"、转账")
+        zhuanzhang()
     elif begin == "5":
         print(5,"、查询")
+        chaxun()
     else:
         print(6,"、退出")
         break
 
-money = 0
-if begin == 2:
-    print("欢迎")
-    print("您的余额：",money)
-    money1 = int(input("请输入想要储蓄的金额："))
-    money = money +money1
-    bank['money'] = money
 
 
 
