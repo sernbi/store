@@ -1,0 +1,209 @@
+import random
+import pymysql
+print("==============================================")
+print("|------------中国工商银行账户管理系统------------|")
+print("|------------1、开户              ------------|")
+print("|------------2、存钱              ------------|")
+print("|------------3、取钱              ------------|")
+print("|------------4、转账              ------------|")
+print("|------------5、查询              ------------|")
+print("|------------6、退出              ------------|")
+print("==============================================")
+
+bank1="狼腾测试猿银行"
+money = 0
+con=pymysql.connect(host="localhost", user='root',password='123456',database='bank')
+cursor=con.cursor()
+
+
+#第一个对应第一个 不是名称对应名称
+#开户
+def bank_adduser():
+    # 查询数据库是否已满
+    sql = "select count(*) from  bank_name"  # count(*)  ->  ((25,),)
+    cursor.execute(sql)
+    data = cursor.fetchall()  # ((56,),)
+    if len(data) >= 100:
+        print("你去别的银行吧")
+
+    # 查询数据库是否存在该用户
+    account = random.randint(10000000, 99999999)
+    sql1 = "select * from bank_name where account = %s"
+    param = [account]
+    cursor.execute(sql1, param)
+    data = cursor.fetchall()  # ((lisi,),)
+
+    if len(data) != 0:
+        print("开户失败，你别重复") # 已存在
+
+    else:  # 正常开户：存储到银行 ，插入数据库
+        username=input("请输入您的用户名")
+        password = input("请输入您的密码")
+        print("请输入您的地址")
+        country=input("\t\t请输入您的国家")
+        province=input("\t\t请输入您的省份")
+        street=input("\t\t请输入您的街道")
+        door=input("\t\t请输入您的门牌号")
+        sql2 = "insert into bank_name values(%s,%s,%s,%s,%s,%s,%s,%s,%s,now())"
+        param = [account, username, password, country, province, street, door, money, bank1]
+        cursor.execute(sql2, param)
+        con.commit()
+        info = '''
+                    ------------个人信息------------
+                    用户名:%s
+                    账号：%s
+                    密码：*****
+                    国籍：%s
+                    省份：%s
+                    街道：%s
+                    门牌号：%s
+                    余额：%s
+                    开户行名称：%s
+                '''
+        # 每个元素都可传入%
+        print(info % (username, account, country, province, street, door, money, bank1))
+
+#存钱
+def addmoney():
+    a1 = int(input("请输入您的账号"))
+    sql3 = "select * from bank_name where account = %s"
+    param = [a1]
+    cursor.execute(sql3,param)
+    data = cursor.fetchall()
+    if len(data) == 1:
+        money1 = float(input("请输入您需要存入的金额："))
+        money2 = data[0][7] + money1
+        sql4 = "update bank_name set money = %s + money where account = %s"
+        param1 = [money2, a1]
+        cursor.execute(sql4, param1)
+        con.commit()
+        info = '''
+                    ------------个人信息------------
+                    用户名:%s
+                    账号：%s
+                    余额：%s
+                    开户行名称：%s
+                '''
+        # 每个元素都可传入%
+        print(info % (data[0][1], data[0][0], money2, data[0][8]))
+    else:
+        print("您的账户输入错误")
+#取钱
+def remoney():
+    a1= int(input("请输入您的账号："))
+    password = input("请输入您的密码：")
+    sql3 = "select * from bank_name where account = %s"
+    param = [a1]
+    cursor.execute(sql3,param)
+    data = cursor.fetchall()
+    if len(data) == 1:
+        if password == data[0][2]:
+            money0 = data[0][7]
+            print("欢迎")
+            print("您的余额：", money0)
+            money1 = float(input("请输入想要取出的金额："))
+            if money1 <= money0:
+                money0 = money0 - money1
+                sql4 = "update bank_name set money = %s where account = %s"
+                param1 = [money0, a1]
+                cursor.execute(sql4, param1)
+                con.commit()
+                info = '''
+                            ------------个人信息------------
+                            用户名:%s
+                            账号：%s
+                            余额：%s
+                            开户行名称：%s
+                        '''
+                # 每个元素都可传入%
+                print(info % (data[0][1], data[0][0], money0, data[0][8]))
+            else:
+                print(("余额不足"))
+        else:
+            print("密码错误")
+    else :
+        print("账号不存在")
+    return 1
+
+
+#转账
+def zhuanzhang():
+    a1 = int(input("请输入转出的账号："))
+    a2 = int(input("请输入转入的账号："))
+    sql3 = "select * from bank_name where account = %s"
+    param = [a1]
+    cursor.execute(sql3,param)
+    data = cursor.fetchall()
+    sql4 = "select * from bank_name where account = %s"
+    param1 = [a2]
+    cursor.execute(sql4,param1)
+    data1 = cursor.fetchall()
+    if len(data) == 1 and len(data1) == 1:
+        password1 = str(input("请输入转出账号的密码："))
+        if password1 == data[0][2] :
+            mvmoney = int(input("请输入您要转出的金额："))
+            if mvmoney < data[0][7]:
+                money0 = data[0][7] - mvmoney
+                sql5 = "update bank_name set money = %s where account = %s"
+                param2 = [money0, a1]
+                cursor.execute(sql5, param2)
+                con.commit()
+                getmoney = data1[0][7] + mvmoney
+                sql6 = "update bank_name set money = %s where account = %s"
+                param2 = [getmoney, a2]
+                cursor.execute(sql6, param2)
+                con.commit()
+                print("转出",mvmoney,"元后，您的账号",a1,"余额为：",money0)
+                print("转入账号",a2,"的余额为：",getmoney)
+            else:
+                print("您的余额不足")
+        else:
+            print("密码错误")
+    else:
+        print("用户不存在")
+
+#查询
+def chaxun():
+    a1 = int(input("请输入您的账号："))
+    sql3 = "select * from bank_name where account = %s"
+    param = [a1]
+    cursor.execute(sql3, param)
+    data = cursor.fetchall()
+    if len(data) == 1:
+        password = input("请输入密码：")
+        if password == data[0][2]:
+            info = '''
+                               ------------个人信息------------
+                               用户名:%s
+                               账号：%s
+                               余额：%s
+                               开户行名称：%s
+                           '''
+            # 每个元素都可传入%
+            print(info % (data[0][1], data[0][0], data[0][7], data[0][8]))
+    else:
+        print("用户不存在")
+
+
+#begin=input("请选择业务")
+while True:
+    begin = input("请选择业务：")
+    if begin =="1":#您输入的业务等于1执行开户操作
+        bank_adduser()
+    elif begin == "2":
+        print(2, "、存钱")
+        addmoney()
+    elif begin == "3":
+        print(3,"、取钱")
+        remoney()
+    elif begin == "4":
+        print(4,"、转账")
+        zhuanzhang()
+    elif begin == "5":
+        print(5,"、查询")
+        chaxun()
+    else:
+        print(6,"、退出")
+        cursor.close()
+        con.close()
+        break
